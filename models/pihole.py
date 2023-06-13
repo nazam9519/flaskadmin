@@ -24,6 +24,6 @@ def pi_dns():
     elif not data or not 'ip' in data or not 'dnsname' in data:
         return 'no parameters or body',404
     shutil.copyfile(f'{pipath}/custom.list',f'{bkpath}/custom.list.old')
-    with open(f'{bkpath}/custom.list.old','a') as newentry:
+    with open(f'{bkpath}/custom.list','a') as newentry:
         newentry.write(f"{data['ip']} {data['dnsname']}")
     return jsonify({'msg':'success!'})
