@@ -24,4 +24,5 @@ def restart():
 @admin_c.route('/shutdown',methods=['GET','POST'])
 def shutdown():
     subprocess.Popen(['/opt/rest/admin/stop_app.py',f"{os.getpid()}"])
+    #exit
     return jsonify({'msg':'stopping app, please login to the controller to restart'})
