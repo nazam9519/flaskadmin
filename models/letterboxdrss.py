@@ -63,6 +63,8 @@ def rss():
             print(len(added))
             movies_added += 1
             print(f"count added: {movies_added}")
+            if movies_added == 10:
+                break
         if movies_added == 10:
             break
     return jsonify(added)
