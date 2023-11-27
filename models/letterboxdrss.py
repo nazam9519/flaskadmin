@@ -6,7 +6,7 @@ import subprocess
 from requests import session
 import re
 from bs4 import BeautifulSoup
-from feedgen.feed import FeedGenerator
+#from feedgen.feed import FeedGenerator
 from modules.setlogs import setlogger
 match_imdb = re.compile(r"^https?://www.imdb.com")
 match_tmdb = re.compile(r"^https?://www.themoviedb.org")
