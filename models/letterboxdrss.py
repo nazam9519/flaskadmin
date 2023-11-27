@@ -60,7 +60,9 @@ def rss():
         for movie in movies:
             added.append(extract_metadata(movie))# = extract_metadata(movie, feed)
             # Update total counter
+            print(len(added))
             movies_added += 1
+            print(f"count added: {movies_added}")
         if movies_added == 10:
             break
     return jsonify(added)
