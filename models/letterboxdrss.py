@@ -57,16 +57,15 @@ def rss():
         for movie in movies:
             added.append(extract_metadata(movie))# = extract_metadata(movie, feed)
             # Update total counter
-            movies_added += added
-    #if user == '':
-     #   subprocess.Popen(['sudo','/opt/rest/admin/restart_app.pl',f'{os.getpid()}'])
-      #  return jsonify({'msg':f'restarting app: {os.getpid()} please wait 30 seconds...'})
-    #else:
-     #   return jsonify({'msg':f"unknown admin arg "})
+            movies_added += 1
+        if movies_added == 10:
+            break
+    return jsonify(added)
+
 
 
 def extract_metadata(movie):
-    movie_url = base_url +"film/"+ movie.div.attrs["data-film-slug"]
+    movie_url = base_url +"/film/"+ movie.div.attrs["data-film-slug"]
     movie_page = s.get(movie_url)
     movie_soup = BeautifulSoup(movie_page.text, "html.parser")
 
@@ -78,6 +77,7 @@ def extract_metadata(movie):
         movie_link = movie_soup.find(
             "a", attrs={"href": [match_imdb, match_tmdb]}
         ).attrs["href"]
+        movie_tm = movie_soup.find("body").attrs['data-tmdb-id']
         if movie_link.endswith("/maindetails"):
             movie_link = movie_link[:-11]
         movie_description = movie_soup.find(
@@ -87,15 +87,8 @@ def extract_metadata(movie):
             movie_description = movie_description.text.strip()
         return {
             'title':movie_title,
-            'imdb_id':movie_link
+            'tmdb_id':movie_tm
         }
-        #item = feed.add_item()
-        #item.title(movie_title)
-        #item.description(movie_description)
-        #item.link(href=movie_link, rel="alternate")
-        #item.guid(movie_link)
-
-        return 1
     except Exception:
         print("Parsing failed on", movie_url)
 
