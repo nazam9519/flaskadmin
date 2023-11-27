@@ -1,8 +1,10 @@
 from flask import Blueprint
 from flask import jsonify
 from flask import request
+from pathlib import Path
 import os
 import subprocess 
+import json
 from requests import session
 import re
 from bs4 import BeautifulSoup
@@ -10,7 +12,7 @@ from bs4 import BeautifulSoup
 from modules.setlogs import setlogger
 match_imdb = re.compile(r"^https?://www.imdb.com")
 match_tmdb = re.compile(r"^https?://www.themoviedb.org")
-
+fp = '/opt/rest/currentfiles'
 base_url = "https://letterboxd.com"
 
 MATCH_TOTAL_MOVIES = re.compile(r"to see (\d+)")
@@ -31,10 +33,12 @@ def rss():
     r = s.get(watchlist_url)
     r.raise_for_status()
     soup = BeautifulSoup(r.text, "html.parser")
-
+    jsoon = None
     watchlist_title = soup.find("meta", attrs={"property": "og:title"})
     page_title = watchlist_title.attrs["content"]
-
+    if Path(f"{fp}/spliff_db.json").exists():
+        jsoon = handlejson(fp+"/spliff_db.json")
+        
     m = soup.find("span", attrs={"class": "js-watchlist-count"})
     if len(m) > 0:
         total_movies = int(m.text.split()[0])
@@ -56,17 +60,23 @@ def rss():
         movies_on_page = len(movies)
 
         print(f"Gathering on page {page} (contains {movies_on_page} movies)\n")
-
         for movie in movies:
+            check = False
+            if jsoon is not None:
+                check = any(d['url'] == movie.div.attrs['data-film-slug'] for d in jsoon)
+            else:
+                jsoon = []
+            if check == True:
+                continue
+            else:
+                jsoon.append({'url':movie.div.attrs['data-film-slug']})
             added.append(extract_metadata(movie))# = extract_metadata(movie, feed)
             # Update total counter
             print(len(added))
             movies_added += 1
             print(f"count added: {movies_added}")
-            if movies_added == 10:
-                break
-        if movies_added == 10:
-            break
+        with open(f"{fp}/spliff_db.json",'w',encoding='utf-8') as f:
+            json.dump(jsoon,f,ensure_ascii=False, indent=4)
     print(added)
     return jsonify(added)
 
@@ -101,3 +111,7 @@ def extract_metadata(movie):
         print("Parsing failed on", movie_url)
 
     return 0
+def handlejson(path: str):
+    with open(path) as f:
+        d = json.load(f)
+        return d
