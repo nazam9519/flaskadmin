@@ -3,7 +3,7 @@ from flask import Flask
 from flask import jsonify
 from models.admin import admin_c
 from models.pihole import phole_c
-from models.admin import letterboxd_c
+from models.letterboxdrss import letterboxd_c
 from  modules.setlogs import setlogger
 import modules.init_opts as options
 import logging
