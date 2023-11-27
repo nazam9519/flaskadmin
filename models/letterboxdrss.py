@@ -25,9 +25,6 @@ def rss():
     logger.info(f"shutting down app: hit")
     user = request.args.get('user')
     watchlist_url = f"{base_url}/{user}/watchlist"
-
-    page_title = "The Dude's Watchlist"
-
     
     # Get first page, gather general data
     r = s.get(watchlist_url)
@@ -63,27 +60,29 @@ def rss():
         for movie in movies:
             check = False
             if jsoon is not None:
-                check = any(d['url'] == movie.div.attrs['data-film-slug'] for d in jsoon)
+                check = any(d['slug'] == movie.div.attrs['data-film-slug'] for d in jsoon)
             else:
                 jsoon = []
             if check == True:
                 continue
             else:
-                jsoon.append({'url':movie.div.attrs['data-film-slug']})
-            added.append(extract_metadata(movie))# = extract_metadata(movie, feed)
+                added = extract_metadata(movie)
+                jsoon.append(added)
+                #jsoon.append({'url':movie.div.attrs['data-film-slug']})
+            #added.append(extract_metadata(movie))# = extract_metadata(movie, feed)
             # Update total counter
             print(len(added))
-            movies_added += 1
+            #movies_added += 1
             print(f"count added: {movies_added}")
         with open(f"{fp}/spliff_db.json",'w',encoding='utf-8') as f:
             json.dump(jsoon,f,ensure_ascii=False, indent=4)
-    print(added)
-    return jsonify(added)
+    return jsonify(handlejson(f"{fp}/spliff_db.json"))
 
 
 
 def extract_metadata(movie):
     movie_url = base_url +"/film/"+ movie.div.attrs["data-film-slug"]
+    movie_slug = movie.div.attrs["data-film-slug"]
     movie_page = s.get(movie_url)
     movie_soup = BeautifulSoup(movie_page.text, "html.parser")
 
@@ -105,7 +104,8 @@ def extract_metadata(movie):
             movie_description = movie_description.text.strip()
         return {
             'title':movie_title,
-            'tmdb_id':movie_tm
+            'tmdb_id':movie_tm,
+            'slug':movie_slug
         }
     except Exception:
         print("Parsing failed on", movie_url)
