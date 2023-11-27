@@ -7,6 +7,7 @@ from requests import session
 import re
 from bs4 import BeautifulSoup
 from feedgen.feed import FeedGenerator
+from modules.setlogs import setlogger
 match_imdb = re.compile(r"^https?://www.imdb.com")
 match_tmdb = re.compile(r"^https?://www.themoviedb.org")
 
@@ -18,12 +19,14 @@ letterboxd_c = Blueprint('letterboxd',__name__)
 
 @letterboxd_c.route('/rss',methods=['GET'])
 def rss():
+    logger = setlogger("letterboxd_app")
+    logger.info(f"shutting down app: hit")
     user = request.args.get('user')
     watchlist_url = f"{base_url}/{user}/watchlist"
 
     page_title = "The Dude's Watchlist"
 
-
+    
     # Get first page, gather general data
     r = s.get(watchlist_url)
     r.raise_for_status()
