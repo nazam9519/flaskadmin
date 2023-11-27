@@ -1,4 +1,4 @@
 __pycache__
 .vs*
 admin/test_soon.py 
-models/testsoup.py
+testscripts/*
