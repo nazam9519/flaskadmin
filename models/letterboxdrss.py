@@ -72,11 +72,6 @@ def rss():
             else:
                 added = extract_metadata(movie)
                 jsoon.append(added)
-                #jsoon.append({'url':movie.div.attrs['data-film-slug']})
-            #added.append(extract_metadata(movie))# = extract_metadata(movie, feed)
-            # Update total counter
-            #print(len(added))
-            #movies_added += 1
             log.info(f"count added: {movies_added}")
         with open(f"{fp}/spliff_db.json",'w',encoding='utf-8') as f:
             json.dump(jsoon,f,ensure_ascii=False, indent=4)
